@@ -1,0 +1,133 @@
+/*	
+Royce Guerra
+- Final Project 'Beer Reviews & Open Beer DB' csv load scripts. 
+*/
+                            ---// OPENBEER DB beer reviews// ---
+BEGIN;                          
+CREATE SCHEMA IF NOT EXISTS da_beerreviewsdb_beer_reviews;
+CREATE TABLE IF NOT EXISTS da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews (
+
+	brewery_id 			INTEGER 	    NOT NULL,
+    brewery_name        VARCHAR(200)    NULL,
+    review_time         INTEGER         NULL,
+    review_overall      FLOAT           NULL,
+    review_aroma        FLOAT           NULL,
+    review_appearance   FLOAT           NULL,
+    review_profilename  VARCHAR(200)    NULL,
+    beer_style          VARCHAR(100)    NULL,
+    review_palate       FLOAT           NULL,
+    review_taste        FLOAT           NULL,
+    beer_name           VARCHAR(200)    NOT NULL,   
+    beer_abv			FLOAT			NULL,
+	beer_beerid			INTEGER			NULL
+    );
+    
+DELETE FROM da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews;
+-- UPDATE THIS PATH: 
+COPY da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews 
+FROM 
+	'C:/Users/rpmgu/Documents/Galvanize/final_project/beer_review_csv/cleanB_names_TRIM_beer_reviews.csv'
+WITH DELIMITER ',' CSV HEADER;
+
+								
+								---// OPENBEER DB beers //---
+CREATE SCHEMA IF NOT EXISTS da_openbeerdb_beers;
+CREATE TABLE IF NOT EXISTS da_openbeerdb_beers.opendb_beers (
+
+    id 				    INTEGER  		NOT NULL,	    
+	brewery_id          INTEGER 		NOT NULL,
+	name                VARCHAR(200)    NOT NULL,
+    cat_id              FLOAT           NOT NULL,
+    style_id            FLOAT           NOT NULL,
+    abv                 FLOAT           NULL,
+    ibu                 FLOAT           NULL,
+    srm                 FLOAT           NULL
+	);
+	
+DELETE FROM da_openbeerdb_beers.opendb_beers;
+-- UPDATE THIS PATH: 
+COPY da_openbeerdb_beers.opendb_beers  
+FROM 
+    'C:/Users/rpmgu/Documents/Galvanize/final_project/openbeerdb_csv/cleanC_remove_emptyrows_beers.csv'
+WITH DELIMITER ',' CSV HEADER;
+
+
+								---// OPENBEER DB breweries //---
+CREATE SCHEMA IF NOT EXISTS da_openbeerdb_breweries;
+CREATE TABLE IF NOT EXISTS da_openbeerdb_breweries.opendb_breweries (
+	
+    id				INTEGER			NULL,
+	name 			VARCHAR(200) 	NOT NULL,
+	address1		VARCHAR(50)		NULL,
+    address2        VARCHAR(50)     NULL,
+    city            VARCHAR(50)     NULL,
+    state           VARCHAR(50)     NULL,
+    code            VARCHAR(20)     NULL,
+    country         VARCHAR(50)     NULL,
+    phone           VARCHAR(20)     NULL,
+    website         VARCHAR(100)    NULL
+    );
+    
+DELETE FROM da_openbeerdb_breweries.opendb_breweries;
+-- UPDATE THIS PATH: 
+COPY da_openbeerdb_breweries.opendb_breweries 
+FROM 
+	'C:/Users/rpmgu/Documents/Galvanize/final_project/openbeerdb_csv/cleanC_name_TRIM_breweries.csv'
+WITH DELIMITER ',' CSV HEADER;
+
+								
+								---// OPENBEER DB breweries geo //---
+CREATE SCHEMA IF NOT EXISTS da_openbeerdb_breweries_geo;
+CREATE TABLE IF NOT EXISTS da_openbeerdb_breweries_geo.opendb_breweries_geo (
+	
+    id				INTEGER		NOT NULL,
+	brewery_id	    INTEGER		NOT NULL,
+    latitude        FLOAT       NULL,
+    longitude       FLOAT       NULL,
+    accuracy        VARCHAR(20) NULL
+    );
+
+DELETE FROM da_openbeerdb_breweries_geo.opendb_breweries_geo;
+-- UPDATE THIS PATH: 
+COPY da_openbeerdb_breweries_geo.opendb_breweries_geo 
+FROM 
+	'C:/Users/rpmgu/Documents/Galvanize/final_project/openbeerdb_csv/cleanA_changedUTF_breweries_geocode.csv'
+WITH DELIMITER ',' CSV HEADER;
+
+
+                                ---// OPENBEER DB categories //---
+CREATE SCHEMA IF NOT EXISTS da_openbeerdb_categories;
+CREATE TABLE IF NOT EXISTS da_openbeerdb_categories.opendb_categories (
+	
+    id					INTEGER						NOT NULL,
+	cat_name			VARCHAR(50)						NULL
+    );
+    
+DELETE FROM da_openbeerdb_categories.opendb_categories;
+-- UPDATE THIS PATH: 
+COPY da_openbeerdb_categories.opendb_categories 
+FROM 
+	'C:/Users/rpmgu/Documents/Galvanize/final_project/openbeerdb_csv/cleanA_changedUTF_categories.csv'
+WITH DELIMITER ',' CSV HEADER;
+
+
+                                ---// OPENBEER DB styles //---
+CREATE SCHEMA IF NOT EXISTS da_openbeerdb_styles;
+CREATE TABLE IF NOT EXISTS  da_openbeerdb_styles.opendb_styles (
+	
+    id			INTEGER        NOT NULL,
+	cat_id		INTEGER        NOT NULL,
+    style_name  VARCHAR(50)    NULL
+    );
+    
+DELETE FROM da_openbeerdb_styles.opendb_styles;
+-- UPDATE THIS PATH: 
+COPY da_openbeerdb_styles.opendb_styles
+FROM 
+	'C:/Users/rpmgu/Documents/Galvanize/final_project/openbeerdb_csv/cleanA_changedUTF_styles.csv'
+WITH DELIMITER ',' CSV HEADER;
+
+
+COMMIT;
+
+

@@ -1,0 +1,149 @@
+-- Royce Guerra - Galvanize Final - Queries
+
+-- QUERY - COUNT, AVG aggregates
+-- COUNT reviews and AVG review by Brewery
+SELECT
+	brewery_name AS Brewery,
+	COUNT(review_overall) AS ReviewCount,
+	AVG(review_overall) AS AverageReview
+FROM
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+GROUP BY 1;
+
+
+-- QUERY - COUNT, AVG aggregates - SUB QUERY
+-- COUNT reviews and AVG review by Beer Style
+SELECT
+	beer_style AS BeerStyle,
+	AVG(review_overall) AS AvgReview,
+		(SELECT AVG(review_overall) AS overallAverage 
+	 	FROM da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews),
+	COUNT(review_overall) AS ReviewCount
+FROM
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+GROUP BY 1;
+
+-- QUERY - CASE
+-- PIVOT TABLE style query
+SELECT 
+	brewery_name,
+	COUNT(CASE WHEN review_overall >= 4.0 THEN 1 ELSE NULL END) AS four_to_five,
+	COUNT(CASE WHEN review_overall >= 3.0 THEN 1 ELSE NULL END) AS three_to_four,
+	COUNT(CASE WHEN review_overall >= 2.0 THEN 1 ELSE NULL END) AS two_to_three,
+	COUNT(CASE WHEN review_overall >= 1.0 THEN 1 ELSE NULL END) AS one_to_two,
+	COUNT(CASE WHEN review_overall > 0 	  THEN 1 ELSE NULL END) AS less_than_one
+FROM da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+GROUP BY 1;
+				  
+		
+-- QUERY - WHERE
+-- WHERE beer ABV > 6.0
+	-- Brewery with Count of Beer Reviews with ABV over 6.0
+SELECT 
+	brewery_name AS Brewery,
+	COUNT(review_overall) AS ReviewCount
+FROM 
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+WHERE
+	beer_abv > 6.0
+GROUP BY 1
+ORDER BY COUNT(review_overall) DESC;
+
+
+-- WHERE
+-- Another Query with breweries with abv below 4.0 and the style
+SELECT 
+	brewery_name AS Brewery,
+	beer_name AS Beer,
+	beer_style AS BeerStyle,
+	beer_abv AS ABV
+	
+FROM 
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+WHERE
+	beer_abv < 4.0
+GROUP BY 1,2,3,4;
+
+
+-- WHERE and OR clause Query
+-- Breweries that have Saison and Stout Beers
+SELECT 
+	brewery_name AS Brewery,
+	beer_name AS Beer,
+	beer_style AS BeerStyle
+FROM
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+	WHERE
+	beer_style = 'Saison / Farmhouse Ale' 
+	OR beer_style = 'American Stout' 
+	OR beer_style = 'Milk / Sweet Stout'
+GROUP BY 1, 2, beer_style
+ORDER BY brewery_name;
+
+
+-- SUB QUERY
+-- Return Beer Style with AVG Review, Overall AVG Review
+SELECT 
+	beer_style AS BeerStyle,
+	AVG(review_overall) AS AverageReview,
+	(SELECT AVG(review_overall) AS OverallAverage 
+	 FROM da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews)
+FROM da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+GROUP BY 1
+ORDER BY beer_style ASC;
+
+-- SUB QUERY - 2
+-- 
+
+
+
+
+
+-- HAVING clause  
+-- TEST for below Query
+SELECT DISTINCT(beer_style) 
+FROM da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+-- WHERE style is SAISON HAVING abv above 6.0
+SELECT 
+	brewery_name AS Brewery,
+	beer_name AS Beer,
+	beer_abv AS ABV
+FROM
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+WHERE
+	beer_style = 'Saison / Farmhouse Ale'
+GROUP BY 1,2,beer_abv
+HAVING
+	beer_abv > 6.0
+ORDER BY 1;
+
+-- JOIN 
+-- Return all Data, loaded into Tableau Dashboard
+-- Breweries (Open BeerDB), Beers(OpenBeerDB), Reviews(ReviewsDB),
+-- 69123 rows returned
+SELECT *
+FROM da_openbeerdb_breweries.opendb_breweries breweries
+JOIN da_openbeerdb_beers.opendb_beers beers 
+	ON breweries.id = beers.brewery_id
+JOIN da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews reviews 
+	ON beers.name = reviews.beer_name 
+		AND breweries.name = reviews.brewery_name;
+				   
+
+-- UNION query/clause needs some work.
+-- NOTE: The Tables I am working with do not have similar tables to be able to use a UNION properly. 
+-- This query is a work in progress.
+SELECT -- reviews table
+	brewery_name AS BreweryReviewsTable,
+	beer_abv AS ABV,
+	beer_name AS Beer,
+	review_overall AS Review
+FROM 
+	da_beerreviewsdb_beer_reviews.beerreviewsdb_beer_reviews
+	
+UNION
+SELECT -- openbeer table, beers
+	name AS BreweryOpenBeerTable
+FROM
+	da_openbeerdb_breweries.opendb_breweries
+				   
